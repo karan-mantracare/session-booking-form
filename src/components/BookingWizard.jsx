@@ -46,7 +46,7 @@ export default function BookingWizard() {
 
   useEffect(() => {
     const userId = sessionStorage.getItem('user_id');
-    fetch(`/api/locations?user_id=${userId}`)
+    fetch(`/mbrdi-onsite-session/api/locations`)
       .then(res => res.json())
       .then(data => {
         if (data.locations) setLocations(data.locations);
@@ -84,7 +84,7 @@ export default function BookingWizard() {
       // Fetch available days for the location
       const userId = sessionStorage.getItem('user_id');
       try {
-        const res = await fetch(`/api/location-days?locationCode=${formData.location_code}&user_id=${userId}`);
+        const res = await fetch(`/mbrdi-onsite-session/api/location-days?locationCode=${formData.location_code}`);
         const data = await res.json();
         if (data.availableDays) {
           setAvailableDays(data.availableDays);
@@ -108,7 +108,7 @@ export default function BookingWizard() {
       const dayOfWeek = format(formData.booking_date, 'EEEE');
       
       try {
-        const res = await fetch(`/api/available-slots?locationCode=${formData.location_code}&date=${dateStr}&day=${dayOfWeek}&user_id=${userId}`);
+        const res = await fetch(`/mbrdi-onsite-session/api/available-slots?locationCode=${formData.location_code}&date=${dateStr}&day=${dayOfWeek}&user_id=${userId}`);
         const data = await res.json();
         if (data.expertSlots) {
           setExpertSlots(data.expertSlots);
@@ -137,7 +137,7 @@ export default function BookingWizard() {
       };
 
       try {
-        const res = await fetch('/api/bookings', {
+        const res = await fetch('/mbrdi-onsite-session/api/bookings', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload)

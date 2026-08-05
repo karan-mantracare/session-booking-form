@@ -26,14 +26,14 @@ export function AuthGate({ children }) {
         return;
       }
       
-      window.location.href = "/token";
+      window.location.href = "/mbrdi-onsite-session/token";
       return;
     }
 
     // For local testing, mock the API if using our dummy token
     if (token === "test-user-12345" && process.env.NODE_ENV === "development") {
       sessionStorage.setItem("user_id", "123456789");
-      fetch("/api/users/upsert", {
+      fetch("/mbrdi-onsite-session/api/users/upsert", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ user_id: "123456789" }),
@@ -45,7 +45,7 @@ export function AuthGate({ children }) {
       return;
     }
 
-    fetch("/api/users/verify", {
+    fetch("/mbrdi-onsite-session/api/users/verify", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ token }),
@@ -67,7 +67,7 @@ export function AuthGate({ children }) {
         setState("authenticated");
       })
       .catch(() => {
-        window.location.href = "/token";
+        window.location.href = "/mbrdi-onsite-session/token";
       });
   }, []);
 

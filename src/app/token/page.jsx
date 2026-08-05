@@ -15,7 +15,7 @@ export default function TokenRegistration() {
     setError(null);
 
     try {
-      const res = await fetch('/api/register', {
+      const res = await fetch('/mbrdi-onsite-session/api/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData)
@@ -34,7 +34,7 @@ export default function TokenRegistration() {
       sessionStorage.setItem("user_department", data.department);
       
       // Redirect back to the root app which will now authorize them via sessionStorage
-      window.location.href = `/?token=${data.id}`;
+      window.location.href = `/mbrdi-onsite-session/?token=${data.id}`;
       
     } catch (err) {
       setError(err.message);
