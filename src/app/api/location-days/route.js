@@ -5,9 +5,8 @@ export async function GET(request) {
   try {
     const { searchParams } = new URL(request.url);
     const locationCode = searchParams.get('locationCode');
-    const userId = searchParams.get('user_id');
 
-    if (!locationCode || !userId) {
+    if (!locationCode) {
       return NextResponse.json({ error: "Missing required parameters" }, { status: 400 });
     }
 

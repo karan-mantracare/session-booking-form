@@ -8,9 +8,8 @@ export async function GET(request) {
     const locationCode = searchParams.get('locationCode');
     const dateStr = searchParams.get('date'); 
     const dayOfWeek = searchParams.get('day'); 
-    const userId = searchParams.get('user_id');
 
-    if (!locationCode || !dateStr || !dayOfWeek || !userId) {
+    if (!locationCode || !dateStr || !dayOfWeek) {
       return NextResponse.json({ error: "Missing required parameters" }, { status: 400 });
     }
 
