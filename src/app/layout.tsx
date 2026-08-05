@@ -16,9 +16,6 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "MantraCare Booking",
   description: "Book your sessions with MantraCare experts",
-  icons: {
-    icon: "/Favicon.png",
-  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
