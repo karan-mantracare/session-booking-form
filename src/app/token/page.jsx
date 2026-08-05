@@ -53,7 +53,7 @@ export default function TokenRegistration() {
           Welcome to MantraCare
         </h2>
         <p className="mt-2 text-center text-sm text-gray-600">
-          Please register to book your sessions.
+          Book your Onsite Session with the Experts
         </p>
       </div>
 
