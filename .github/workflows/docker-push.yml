@@ -26,3 +26,5 @@ jobs:
           context: .
           push: true
           tags: bunker.mantracare.com/lovable/mbrdi-onsite-session:1.0
+          build-args: |
+            DATABASE_URL=${{ secrets.DATABASE_URL }}
