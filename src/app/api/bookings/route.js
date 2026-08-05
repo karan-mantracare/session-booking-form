@@ -34,13 +34,30 @@ export async function POST(request) {
     const result = await query(insertQuery, values);
     const newBooking = result.rows[0];
 
+    // Fetch the expert email
+    let expertEmail = null;
+    try {
+      const expertResult = await query('SELECT email FROM experts WHERE id = $1', [data.expert_id]);
+      if (expertResult.rows.length > 0) {
+        expertEmail = expertResult.rows[0].email;
+      }
+    } catch (e) {
+      console.error("Failed to fetch expert email:", e);
+    }
+    
+    // Add expert_email to the webhook payload
+    const webhookPayload = {
+      ...newBooking,
+      expert_email: expertEmail
+    };
+
     // Trigger Webhook
     try {
       const webhookUrl = 'https://workflows.mantracare.com/webhook/mbrdi-session-booking';
       const webhookResponse = await fetch(webhookUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(newBooking),
+        body: JSON.stringify(webhookPayload),
       });
       if (!webhookResponse.ok) {
         const errText = await webhookResponse.text();
