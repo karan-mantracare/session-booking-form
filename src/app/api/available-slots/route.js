@@ -57,8 +57,13 @@ export async function GET(request) {
         const timeString = format(currentTime, 'HH:mm');
         const proposedSessionEnd = addMinutes(currentTime, 60);
         
-        // Skip if the 60 min session exceeds the expert's working hours
-        if (proposedSessionEnd > endTime) {
+        // Check if slot is in the past (assuming IST timezone +05:30)
+        const slotDateTime = new Date(`${dateStr}T${timeString}:00+05:30`);
+        const now = new Date();
+        const isPastSlot = isBefore(slotDateTime, now);
+        
+        // Skip if the 60 min session exceeds the expert's working hours or is in the past
+        if (proposedSessionEnd > endTime || isPastSlot) {
           currentTime = addMinutes(currentTime, 30);
           continue;
         }
