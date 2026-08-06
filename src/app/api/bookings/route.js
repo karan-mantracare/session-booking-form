@@ -31,8 +31,23 @@ export async function POST(request) {
       data.user_id
     ];
 
-    const result = await query(insertQuery, values);
+    let result;
+    try {
+      result = await query(insertQuery, values);
+    } catch (dbError) {
+      // Check if it's a unique constraint violation (code 23505)
+      if (dbError.code === '23505') {
+        return NextResponse.json({ error: "Sorry, this slot has just been booked by another user. Please select a different time." }, { status: 409 });
+      }
+      throw dbError;
+    }
+    
     const newBooking = result.rows[0];
+
+    // Remove the hold since booking is confirmed
+    await query(`
+      DELETE FROM on_hold_slots WHERE user_id = $1
+    `, [data.user_id]);
 
     // Fetch the expert email
     let expertEmail = null;

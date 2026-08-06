@@ -44,6 +44,19 @@ export async function GET(request) {
     );
     const bookings = bookingsRes.rows;
 
+    // Clean up expired holds
+    await query(`
+      DELETE FROM on_hold_slots 
+      WHERE created_at < NOW() - INTERVAL '1 minute'
+    `);
+
+    // Fetch active holds for the date
+    const holdsRes = await query(
+      'SELECT expert_id, booking_time FROM on_hold_slots WHERE booking_date = $1',
+      [dateStr]
+    );
+    const holds = holdsRes.rows;
+
     // Filter out experts who are on leave
     const availableExperts = experts.filter(e => !leaveExpertIds.includes(e.id));
 
@@ -80,8 +93,18 @@ export async function GET(request) {
           // True if the proposed 60 min slot overlaps with an existing booking
           return isBefore(bStart, slotEnd) && isBefore(slotStart, bEnd);
         });
+
+        // Check if there is an active hold for this slot
+        const isHeld = holds.some(h => {
+           if (h.expert_id !== expert.id) return false;
+           
+           // Assuming a hold is only for the exact starting time for simplicity,
+           // or we can parse it. The frontend requests exact times.
+           const hStart = parse(h.booking_time, 'HH:mm:ss', new Date());
+           return hStart.getTime() === currentTime.getTime();
+        });
         
-        if (!isBooked) {
+        if (!isBooked && !isHeld) {
           slots.push(timeString);
         }
         

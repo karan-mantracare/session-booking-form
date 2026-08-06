@@ -79,5 +79,16 @@ CREATE TABLE bookings (
     duration INT DEFAULT 60,
     user_id BIGINT REFERENCES users(id) ON DELETE CASCADE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT unique_booking_slot UNIQUE (expert_id, booking_date, booking_time)
+);
+
+-- 7. Table on_hold_slots
+CREATE TABLE on_hold_slots (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    expert_id UUID REFERENCES experts(id) ON DELETE CASCADE,
+    booking_date DATE NOT NULL,
+    booking_time TIME NOT NULL,
+    user_id BIGINT REFERENCES users(id) ON DELETE CASCADE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );

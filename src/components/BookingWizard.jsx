@@ -13,6 +13,7 @@ export default function BookingWizard() {
   const [locations, setLocations] = useState([]);
   const [availableDays, setAvailableDays] = useState([]);
   const [expertSlots, setExpertSlots] = useState([]);
+  const [countdown, setCountdown] = useState(-1);
   
   const [currentMonth, setCurrentMonth] = useState(startOfMonth(new Date()));
   
@@ -53,6 +54,78 @@ export default function BookingWizard() {
       })
       .catch(err => console.error("Failed to fetch locations", err));
   }, []);
+
+  useEffect(() => {
+    let interval = null;
+    if (countdown > 0) {
+      interval = setInterval(() => {
+        setCountdown((prev) => prev - 1);
+      }, 1000);
+    } else if (countdown === 0 && formData.booking_time && step === 3) {
+      // Countdown expired
+      setFormData(prev => ({ ...prev, booking_time: null, expert_id: null, expert_name: '' }));
+      setError("Your time to complete the booking has expired. Please start again.");
+      setStep(1);
+      setCountdown(-1);
+    }
+    return () => clearInterval(interval);
+  }, [countdown, formData.booking_time, step]);
+
+  const handleExit = () => {
+    // 1. React Native WebView
+    if (window.ReactNativeWebView) {
+      window.ReactNativeWebView.postMessage(
+        JSON.stringify({ action: "exit" })
+      );
+      return;
+    }
+
+    // 2. iframe inside web.mantracare.com
+    if (window.parent !== window) {
+      window.parent.postMessage(
+        { action: "exit" },
+        "https://web.mantracare.com"
+      );
+      return;
+    }
+
+    // 3. Standalone browser
+    window.location.href = "https://web.mantracare.com";
+  };
+
+  const handleSlotClick = async (time, expert) => {
+    const userId = sessionStorage.getItem('user_id');
+    const dateStr = format(formData.booking_date, 'yyyy-MM-dd');
+    
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await fetch('/mbrdi-onsite-session/api/hold-slot', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          expert_id: expert.expert_id,
+          booking_date: dateStr,
+          booking_time: time,
+          user_id: userId
+        })
+      });
+      const data = await res.json();
+      
+      if (res.ok && data.success) {
+        setFormData({...formData, booking_time: time, expert_id: expert.expert_id, expert_name: expert.expert_name});
+        setCountdown(60);
+      } else {
+        setError(data.error || "Failed to hold slot. It might be taken.");
+        setFormData({...formData, booking_time: null, expert_id: null, expert_name: ''});
+        setCountdown(-1);
+      }
+    } catch (err) {
+      setError("Network error trying to hold slot.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleNext = async () => {
     if (step === 1) {
@@ -159,6 +232,11 @@ export default function BookingWizard() {
   const handleBack = () => {
     setError(null);
     setFieldErrors({});
+    if (step === 3 && formData.booking_time) {
+      // Clear hold if going back from step 3
+      setFormData(prev => ({ ...prev, booking_time: null, expert_id: null, expert_name: '' }));
+      setCountdown(-1);
+    }
     setStep(prev => prev - 1);
   };
 
@@ -378,7 +456,7 @@ export default function BookingWizard() {
                               return (
                                 <button
                                   key={time}
-                                  onClick={() => setFormData({...formData, booking_time: time, expert_id: expert.expert_id, expert_name: expert.expert_name})}
+                                  onClick={() => handleSlotClick(time, expert)}
                                   className={`py-2 text-sm font-medium rounded-xl border transition-all ${isSelected ? 'bg-blue-600 text-white border-blue-600 shadow-md' : 'bg-gray-50 text-gray-700 border-gray-200 hover:border-blue-300 hover:bg-blue-50'}`}
                                 >
                                   {time}
@@ -427,6 +505,15 @@ export default function BookingWizard() {
                     <span>{formData.location_code}</span>
                   </div>
                 </div>
+                
+                <div className="mt-8 flex items-center justify-center gap-4">
+                  <button 
+                    onClick={handleExit}
+                    className="px-8 py-3 bg-gray-100 text-gray-700 font-medium rounded-xl hover:bg-gray-200 transition-all"
+                  >
+                    Exit
+                  </button>
+                </div>
               </div>
             )}
           </motion.div>
@@ -447,19 +534,24 @@ export default function BookingWizard() {
               <div></div>
             )}
             
-            <button
-              onClick={handleNext}
-              disabled={loading}
-              className="flex items-center gap-2 px-8 py-3 bg-blue-600 text-white font-medium rounded-xl hover:bg-blue-700 hover:shadow-lg hover:shadow-blue-600/20 active:scale-95 transition-all disabled:opacity-70 disabled:pointer-events-none"
-            >
-              {loading ? (
-                <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
-              ) : step === 3 ? (
-                "Confirm Booking"
-              ) : (
-                <>Continue <ChevronRight className="w-4 h-4" /></>
-              )}
-            </button>
+            {step === 4 ? null : (
+              <button
+                onClick={handleNext}
+                disabled={loading}
+                className="flex items-center gap-2 px-8 py-3 bg-blue-600 text-white font-medium rounded-xl hover:bg-blue-700 hover:shadow-lg hover:shadow-blue-600/20 active:scale-95 transition-all disabled:opacity-70 disabled:pointer-events-none"
+              >
+                {loading ? (
+                  <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
+                ) : step === 3 ? (
+                  <div className="flex items-center gap-2">
+                    Confirm Booking
+                    {countdown > 0 && <span className="bg-white text-blue-600 px-2 py-0.5 rounded-md font-bold text-xs shadow-sm">{countdown}s</span>}
+                  </div>
+                ) : (
+                  <>Continue <ChevronRight className="w-4 h-4" /></>
+                )}
+              </button>
+            )}
           </div>
         )}
       </div>
