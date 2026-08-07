@@ -15,6 +15,7 @@ export default function BookingWizard() {
   const [expertSlots, setExpertSlots] = useState([]);
   const [countdown, setCountdown] = useState(-1);
   const [consentChecked, setConsentChecked] = useState(false);
+  const [showConsentPoints, setShowConsentPoints] = useState(false);
   
   const [currentMonth, setCurrentMonth] = useState(startOfMonth(new Date()));
   
@@ -371,15 +372,16 @@ export default function BookingWizard() {
                   </div>
 
                   <div className="relative">
-                    <Heart className="absolute left-3 top-4 w-5 h-5 text-gray-400" />
-                    <textarea placeholder="How are you feeling? (Optional)" rows="3" className="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition-all resize-none" value={formData.feeling} onChange={e => setFormData({...formData, feeling: e.target.value})}></textarea>
+                    <Heart className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                    <input type="text" placeholder="How are you feeling? (Optional)" className="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition-all" value={formData.feeling} onChange={e => setFormData({...formData, feeling: e.target.value})} />
                   </div>
 
-                  <div className={`p-4 rounded-xl border ${fieldErrors.consent ? 'border-red-500 bg-red-50' : 'border-gray-200 bg-gray-50'}`}>
-                    <label className="flex items-start gap-3 cursor-pointer">
+                  <div id="consent-box" className={`p-4 rounded-xl border ${fieldErrors.consent ? 'border-red-500 bg-red-50' : 'border-gray-200 bg-gray-50'}`}>
+                    <div className="flex items-start gap-3">
                       <div className="flex items-center h-5 mt-0.5">
                         <input
                           type="checkbox"
+                          id="consent-checkbox"
                           className="w-5 h-5 text-blue-600 bg-white border-gray-300 rounded focus:ring-blue-500 cursor-pointer"
                           checked={consentChecked}
                           onChange={(e) => {
@@ -388,18 +390,29 @@ export default function BookingWizard() {
                           }}
                         />
                       </div>
-                      <div className="text-sm text-gray-700">
-                        <p className="font-semibold mb-2">I have read and agree to the Consent for In-Person Session and Privacy Notice. Read the Consent Points:</p>
-                        <ul className="list-disc pl-5 space-y-1 text-gray-600">
-                          <li>My participation in this MantraCare session is voluntary.</li>
-                          <li>The session will be conducted in person at the Mercedes-Benz office.</li>
-                          <li>Information shared during the session will be kept confidential, except where disclosure is required due to a serious risk of harm, abuse, or a legal obligation.</li>
-                          <li>Mercedes-Benz will not receive details of my discussion without my consent. Only anonymised or aggregated utilisation data may be shared.</li>
-                          <li>This session is not an emergency service. In an emergency, I should contact local emergency services or the appropriate crisis support service.</li>
-                          <li>I may withdraw my consent or stop the session at any time.</li>
-                        </ul>
+                      <div className="text-sm text-gray-700 flex-1">
+                        <label htmlFor="consent-checkbox" className="font-semibold mb-1 block cursor-pointer">
+                          I have read and agree to the Consent for In-Person Session and Privacy Notice.
+                        </label>
+                        <button
+                          type="button"
+                          onClick={() => setShowConsentPoints(!showConsentPoints)}
+                          className="text-blue-600 font-medium hover:text-blue-800 transition-colors text-xs flex items-center gap-1 mb-1"
+                        >
+                          {showConsentPoints ? 'Read Less ^' : 'Read More v'}
+                        </button>
+                        
+                        {showConsentPoints && (
+                          <ul className="list-disc pl-5 mt-2 space-y-1 text-gray-600">
+                            <li>My participation in this MantraCare session is voluntary.</li>
+                            <li>The session will be conducted in person at the Mercedes-Benz office.</li>
+                            <li>Information shared during the session will be kept confidential, except where disclosure is required due to a serious risk of harm, abuse, or a legal obligation.</li>
+                            <li>Mercedes-Benz will not receive details of my discussion without my consent. Only anonymised or aggregated utilisation data may be shared.</li>
+                            <li>I may withdraw my consent or stop the session at any time.</li>
+                          </ul>
+                        )}
                       </div>
-                    </label>
+                    </div>
                   </div>
                 </div>
               </div>
