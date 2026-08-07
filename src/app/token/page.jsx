@@ -43,17 +43,17 @@ export default function TokenRegistration() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8 relative overflow-hidden">
+    <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
       {/* Decorative Blobs */}
-      <div className="absolute top-0 left-0 w-[500px] h-[500px] bg-blue-400/20 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-blob"></div>
-      <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-purple-400/20 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-blob animation-delay-2000"></div>
+      <div className="absolute top-0 left-0 w-72 h-72 sm:w-[500px] sm:h-[500px] bg-blue-400/20 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-blob"></div>
+      <div className="absolute top-0 right-0 w-72 h-72 sm:w-[500px] sm:h-[500px] bg-purple-400/20 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-blob animation-delay-2000"></div>
       
       <div className="sm:mx-auto sm:w-full sm:max-w-md relative z-10">
-        <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900 tracking-tight">
+        <h2 className="mt-6 text-center text-2xl sm:text-3xl font-extrabold text-gray-900 tracking-tight">
           Welcome to MantraCare
         </h2>
-        <p className="mt-2 text-center text-sm text-gray-600">
-          Book your Onsite Session with the Experts
+        <p className="mt-2 text-center text-sm text-gray-600 px-4">
+          Book your In-person Session with the Counselor
         </p>
       </div>
 
@@ -62,7 +62,7 @@ export default function TokenRegistration() {
         animate={{ opacity: 1, y: 0 }}
         className="mt-8 sm:mx-auto sm:w-full sm:max-w-md relative z-10"
       >
-        <div className="bg-white/80 backdrop-blur-xl py-8 px-4 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100/50 sm:rounded-3xl sm:px-10">
+        <div className="bg-white/80 backdrop-blur-xl py-8 px-5 sm:px-10 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100/50 rounded-2xl sm:rounded-3xl">
           
           {error && (
             <div className="mb-4 bg-red-50 border border-red-200 text-red-600 rounded-xl p-4 text-sm font-medium">

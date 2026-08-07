@@ -306,7 +306,7 @@ export default function BookingWizard() {
     <div className="w-full max-w-2xl mx-auto bg-white/80 backdrop-blur-xl rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100/50 overflow-hidden">
       
       {/* Progress Header */}
-      <div className="bg-gray-50/50 px-8 py-6 border-b border-gray-100">
+      <div className="bg-gray-50/50 px-4 sm:px-8 py-4 sm:py-6 border-b border-gray-100">
         <div className="flex justify-between items-center relative">
           <div className="absolute left-0 top-1/2 -translate-y-1/2 w-full h-1 bg-gray-200 rounded-full z-0"></div>
           <div className="absolute left-0 top-1/2 -translate-y-1/2 h-1 bg-blue-600 rounded-full z-0 transition-all duration-500" style={{ width: `${((step - 1) / 3) * 100}%` }}></div>
@@ -319,7 +319,7 @@ export default function BookingWizard() {
         </div>
       </div>
 
-      <div className="p-8">
+      <div className="p-4 sm:p-8">
         <AnimatePresence mode="wait">
           <motion.div
             key={step}
@@ -377,7 +377,7 @@ export default function BookingWizard() {
             {/* STEP 2: Date Selection (Month Calendar) */}
             {step === 2 && (
               <div className="space-y-6">
-                <div className="flex items-center justify-between">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                   <div>
                     <h2 className="text-2xl font-bold text-gray-900 mb-1">Select a Date</h2>
                     <p className="text-gray-500">Choose a day that works best for you.</p>
@@ -431,16 +431,16 @@ export default function BookingWizard() {
                 {error && <div className="p-4 bg-red-50 text-red-600 rounded-xl text-sm">{error}</div>}
 
                 {expertSlots.length === 0 ? (
-                  <div className="p-8 text-center border-2 border-dashed border-gray-200 rounded-2xl">
+                  <div className="p-4 sm:p-8 text-center border-2 border-dashed border-gray-200 rounded-2xl">
                     <CalendarIcon className="w-10 h-10 text-gray-300 mx-auto mb-3" />
                     <p className="text-gray-500">No experts are available on this date. Please go back and try another day.</p>
                   </div>
                 ) : (
                   <div className="space-y-6">
                     {expertSlots.map(expert => (
-                      <div key={expert.expert_id} className="bg-white border border-gray-100 rounded-2xl p-5 shadow-sm">
+                      <div key={expert.expert_id} className="bg-white border border-gray-100 rounded-2xl p-4 sm:p-5 shadow-sm">
                         <div className="flex items-center gap-3 mb-4">
-                          <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold">
+                          <div className="w-10 h-10 flex-shrink-0 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold">
                             {expert.expert_name.charAt(0)}
                           </div>
                           <div>
@@ -476,7 +476,7 @@ export default function BookingWizard() {
 
             {/* STEP 4: Confirmation */}
             {step === 4 && (
-              <div className="flex flex-col items-center justify-center py-10 text-center space-y-6">
+              <div className="flex flex-col items-center justify-center py-6 sm:py-10 text-center space-y-6">
                 <motion.div 
                   initial={{ scale: 0 }} 
                   animate={{ scale: 1 }} 
@@ -521,7 +521,7 @@ export default function BookingWizard() {
 
         {/* Navigation Buttons */}
         {step < 4 && (
-          <div className="mt-8 flex items-center justify-between pt-6 border-t border-gray-100">
+          <div className="mt-6 sm:mt-8 flex flex-col-reverse sm:flex-row items-center justify-between gap-4 pt-6 border-t border-gray-100">
             {step > 1 ? (
               <button 
                 onClick={handleBack}
