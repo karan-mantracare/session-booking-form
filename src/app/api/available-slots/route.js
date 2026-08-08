@@ -30,12 +30,12 @@ export async function GET(request) {
     
     const experts = expertsRes.rows;
 
-    // Fetch leaves for the date
-    const leavesRes = await query(
-      'SELECT expert_id FROM leaves WHERE leave_date = $1',
+    // Fetch unavailabilities for the date
+    const unavailRes = await query(
+      'SELECT expert_id, time_from, time_to FROM unavailable WHERE date = $1',
       [dateStr]
     );
-    const leaveExpertIds = leavesRes.rows.map(l => l.expert_id);
+    const unavailabilities = unavailRes.rows;
 
     // Fetch bookings for the date
     const bookingsRes = await query(
@@ -57,11 +57,8 @@ export async function GET(request) {
     );
     const holds = holdsRes.rows;
 
-    // Filter out experts who are on leave
-    const availableExperts = experts.filter(e => !leaveExpertIds.includes(e.id));
-
     // Generate slots
-    const expertSlots = availableExperts.map(expert => {
+    const expertSlots = experts.map(expert => {
       const slots = [];
       let currentTime = parse(expert.start_time, 'HH:mm:ss', new Date());
       const endTime = parse(expert.end_time, 'HH:mm:ss', new Date());
@@ -104,7 +101,24 @@ export async function GET(request) {
            return hStart.getTime() === currentTime.getTime();
         });
         
-        if (!isBooked && !isHeld) {
+        const isUnavailable = unavailabilities.some(u => {
+          if (u.expert_id !== expert.id) return false;
+          
+          if (!u.time_from || !u.time_to) {
+            // Full day leave
+            return true;
+          }
+          
+          const uStart = parse(u.time_from, 'HH:mm:ss', new Date());
+          const uEnd = parse(u.time_to, 'HH:mm:ss', new Date());
+          
+          const slotStart = currentTime;
+          const slotEnd = proposedSessionEnd;
+          
+          return isBefore(uStart, slotEnd) && isBefore(slotStart, uEnd);
+        });
+        
+        if (!isBooked && !isHeld && !isUnavailable) {
           slots.push(timeString);
         }
         
